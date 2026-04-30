@@ -8,7 +8,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -50,7 +52,7 @@ public class ImmunizationService {
         immunization.setVaccineName(dto.getVaccineName());
         immunization.setManufacturer(dto.getManufacturer());
         immunization.setLotNumber(dto.getLotNumber());
-        immunization.setAdministrationDate(dto.getAdministrationDate());
+        immunization.setAdministrationDate(parseDate(dto.getAdministrationDate()));
         immunization.setAdministeredBy(dto.getAdministeredBy());
         immunization.setFacilityName(dto.getFacilityName());
         immunization.setFacilityAddress(dto.getFacilityAddress());
@@ -70,7 +72,7 @@ public class ImmunizationService {
         dto.setVaccineName(immunization.getVaccineName());
         dto.setManufacturer(immunization.getManufacturer());
         dto.setLotNumber(immunization.getLotNumber());
-        dto.setAdministrationDate(immunization.getAdministrationDate());
+        dto.setAdministrationDate(immunization.getAdministrationDate() != null ? immunization.getAdministrationDate().toString() : null);
         dto.setAdministeredBy(immunization.getAdministeredBy());
         dto.setFacilityName(immunization.getFacilityName());
         dto.setFacilityAddress(immunization.getFacilityAddress());
@@ -87,11 +89,20 @@ public class ImmunizationService {
         immunization.setVaccineName(dto.getVaccineName());
         immunization.setManufacturer(dto.getManufacturer());
         immunization.setLotNumber(dto.getLotNumber());
-        immunization.setAdministrationDate(dto.getAdministrationDate());
+        immunization.setAdministrationDate(parseDate(dto.getAdministrationDate()));
         immunization.setAdministeredBy(dto.getAdministeredBy());
         immunization.setFacilityName(dto.getFacilityName());
         immunization.setFacilityAddress(dto.getFacilityAddress());
         immunization.setNotes(dto.getNotes());
         return immunization;
+    }
+
+    private LocalDate parseDate(String dateStr) {
+        if (dateStr == null || dateStr.isEmpty()) return null;
+        try {
+            return LocalDate.parse(dateStr);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

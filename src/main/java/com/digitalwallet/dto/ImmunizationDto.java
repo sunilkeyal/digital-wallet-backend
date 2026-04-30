@@ -8,7 +8,7 @@ public class ImmunizationDto {
     private String vaccineName;
     private String manufacturer;
     private String lotNumber;
-    private LocalDate administrationDate;
+    private String administrationDate;
     private String administeredBy;
     private String facilityName;
     private String facilityAddress;
@@ -26,8 +26,8 @@ public class ImmunizationDto {
     public void setManufacturer(String manufacturer) { this.manufacturer = manufacturer; }
     public String getLotNumber() { return lotNumber; }
     public void setLotNumber(String lotNumber) { this.lotNumber = lotNumber; }
-    public LocalDate getAdministrationDate() { return administrationDate; }
-    public void setAdministrationDate(LocalDate administrationDate) { this.administrationDate = administrationDate; }
+    public String getAdministrationDate() { return administrationDate; }
+    public void setAdministrationDate(String administrationDate) { this.administrationDate = administrationDate; }
     public String getAdministeredBy() { return administeredBy; }
     public void setAdministeredBy(String administeredBy) { this.administeredBy = administeredBy; }
     public String getFacilityName() { return facilityName; }
