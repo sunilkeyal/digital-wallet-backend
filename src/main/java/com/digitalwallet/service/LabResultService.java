@@ -3,6 +3,10 @@ package com.digitalwallet.service;
 import com.digitalwallet.dto.LabResultDto;
 import com.digitalwallet.entity.LabResult;
 import com.digitalwallet.repository.LabResultRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,10 +20,18 @@ public class LabResultService {
         this.labResultRepository = labResultRepository;
     }
 
-    public List<LabResultDto> getByUserId(String userId) {
-        return labResultRepository.findByUserIdOrderByTestDateDesc(userId).stream()
+    public List<LabResultDto> getByUserId(String userId, String sortBy, String sortDir) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        return labResultRepository.findByUserId(userId, sort).stream()
                 .map(this::mapToDto)
                 .toList();
+    }
+
+    public Page<LabResultDto> getByUserIdPaginated(String userId, int page, int size, String sortBy, String sortDir) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<LabResult> labResultPage = labResultRepository.findByUserId(userId, pageable);
+        return labResultPage.map(this::mapToDto);
     }
 
     public LabResultDto getById(String id) {

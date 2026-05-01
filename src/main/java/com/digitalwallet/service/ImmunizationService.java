@@ -6,6 +6,7 @@ import com.digitalwallet.repository.ImmunizationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,14 +21,16 @@ public class ImmunizationService {
         this.immunizationRepository = immunizationRepository;
     }
 
-    public List<ImmunizationDto> getByUserId(String userId) {
-        return immunizationRepository.findByUserId(userId).stream()
+    public List<ImmunizationDto> getByUserId(String userId, String sortBy, String sortDir) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        return immunizationRepository.findByUserId(userId, sort).stream()
                 .map(this::mapToDto)
                 .toList();
     }
 
-    public Page<ImmunizationDto> getByUserIdPaginated(String userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<ImmunizationDto> getByUserIdPaginated(String userId, int page, int size, String sortBy, String sortDir) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Immunization> immunizationPage = immunizationRepository.findByUserId(userId, pageable);
         return immunizationPage.map(this::mapToDto);
     }

@@ -4,6 +4,7 @@ import com.digitalwallet.dto.InsuranceCardDto;
 import com.digitalwallet.service.InsuranceCardService;
 import com.digitalwallet.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,16 @@ public class InsuranceCardController {
     }
 
     @GetMapping
-    public ResponseEntity<List<InsuranceCardDto>> getAllInsuranceCards() {
+    public ResponseEntity<?> getAllInsuranceCards(@RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size,
+                                                 @RequestParam(defaultValue = "provider") String sortBy,
+                                                 @RequestParam(defaultValue = "asc") String sortDir) {
         String userId = userService.getCurrentUserId();
-        return ResponseEntity.ok(insuranceCardService.getByUserId(userId));
+        if (size <= 0 || size > 1000) {
+            return ResponseEntity.ok(insuranceCardService.getByUserId(userId, sortBy, sortDir));
+        }
+        Page<InsuranceCardDto> result = insuranceCardService.getByUserIdPaginated(userId, page, size, sortBy, sortDir);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")

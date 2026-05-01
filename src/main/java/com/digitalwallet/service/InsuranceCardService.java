@@ -3,6 +3,10 @@ package com.digitalwallet.service;
 import com.digitalwallet.dto.InsuranceCardDto;
 import com.digitalwallet.entity.InsuranceCard;
 import com.digitalwallet.repository.InsuranceCardRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,10 +20,18 @@ public class InsuranceCardService {
         this.insuranceCardRepository = insuranceCardRepository;
     }
 
-    public List<InsuranceCardDto> getByUserId(String userId) {
-        return insuranceCardRepository.findByUserId(userId).stream()
+    public List<InsuranceCardDto> getByUserId(String userId, String sortBy, String sortDir) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        return insuranceCardRepository.findByUserId(userId, sort).stream()
                 .map(this::mapToDto)
                 .toList();
+    }
+
+    public Page<InsuranceCardDto> getByUserIdPaginated(String userId, int page, int size, String sortBy, String sortDir) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<InsuranceCard> insuranceCardPage = insuranceCardRepository.findByUserId(userId, pageable);
+        return insuranceCardPage.map(this::mapToDto);
     }
 
     public InsuranceCardDto getById(String id) {

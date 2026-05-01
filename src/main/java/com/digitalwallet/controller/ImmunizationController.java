@@ -24,13 +24,15 @@ public class ImmunizationController {
 
     @GetMapping
     public ResponseEntity<?> getAllImmunizations(@RequestParam(defaultValue = "0") int page,
-                                                  @RequestParam(defaultValue = "10") int size) {
+                                                   @RequestParam(defaultValue = "10") int size,
+                                                   @RequestParam(defaultValue = "vaccineName") String sortBy,
+                                                   @RequestParam(defaultValue = "asc") String sortDir) {
         String userId = userService.getCurrentUserId();
         if (size <= 0 || size > 1000) {
             // Return all records (ALL option)
-            return ResponseEntity.ok(immunizationService.getByUserId(userId));
+            return ResponseEntity.ok(immunizationService.getByUserId(userId, sortBy, sortDir));
         }
-        Page<ImmunizationDto> result = immunizationService.getByUserIdPaginated(userId, page, size);
+        Page<ImmunizationDto> result = immunizationService.getByUserIdPaginated(userId, page, size, sortBy, sortDir);
         return ResponseEntity.ok(result);
     }
 

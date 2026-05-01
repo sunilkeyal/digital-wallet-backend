@@ -4,6 +4,7 @@ import com.digitalwallet.dto.LabResultDto;
 import com.digitalwallet.service.LabResultService;
 import com.digitalwallet.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,16 @@ public class LabResultController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LabResultDto>> getAllLabResults() {
+    public ResponseEntity<?> getAllLabResults(@RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int size,
+                                             @RequestParam(defaultValue = "testDate") String sortBy,
+                                             @RequestParam(defaultValue = "desc") String sortDir) {
         String userId = userService.getCurrentUserId();
-        return ResponseEntity.ok(labResultService.getByUserId(userId));
+        if (size <= 0 || size > 1000) {
+            return ResponseEntity.ok(labResultService.getByUserId(userId, sortBy, sortDir));
+        }
+        Page<LabResultDto> result = labResultService.getByUserIdPaginated(userId, page, size, sortBy, sortDir);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")

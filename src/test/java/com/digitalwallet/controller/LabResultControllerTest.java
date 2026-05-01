@@ -46,9 +46,22 @@ class LabResultControllerTest {
         when(userService.getCurrentUserId()).thenReturn("user123");
         when(labResultService.getByUserId("user123")).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/lab-results"))
+        mockMvc.perform(get("/api/lab-results").param("size", "1001"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    @WithMockUser
+    void getAllLabResults_withPagination_returnsPage() throws Exception {
+        when(userService.getCurrentUserId()).thenReturn("user123");
+        org.springframework.data.domain.Page<LabResultDto> mockPage = 
+            new org.springframework.data.domain.PageImpl<>(List.of());
+        when(labResultService.getByUserIdPaginated("user123", 0, 10)).thenReturn(mockPage);
+
+        mockMvc.perform(get("/api/lab-results").param("page", "0").param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray());
     }
 
     @Test

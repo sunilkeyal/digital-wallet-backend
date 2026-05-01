@@ -45,9 +45,22 @@ class InsuranceCardControllerTest {
         when(userService.getCurrentUserId()).thenReturn("user123");
         when(insuranceCardService.getByUserId("user123")).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/insurance-cards"))
+        mockMvc.perform(get("/api/insurance-cards").param("size", "1001"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    @WithMockUser
+    void getAllInsuranceCards_withPagination_returnsPage() throws Exception {
+        when(userService.getCurrentUserId()).thenReturn("user123");
+        org.springframework.data.domain.Page<InsuranceCardDto> mockPage = 
+            new org.springframework.data.domain.PageImpl<>(List.of());
+        when(insuranceCardService.getByUserIdPaginated("user123", 0, 10)).thenReturn(mockPage);
+
+        mockMvc.perform(get("/api/insurance-cards").param("page", "0").param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray());
     }
 
     @Test
