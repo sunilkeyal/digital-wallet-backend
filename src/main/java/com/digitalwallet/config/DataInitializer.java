@@ -34,26 +34,13 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         var admin = userService.createAdminUser();
-        String userId = admin.getId();
         System.out.println("Admin user ready: " + admin.getEmail());
+    }
 
-        if (immunizationRepository.findByUserId(userId).isEmpty()) {
-            List<Immunization> sampleData = createSampleImmunizations(userId);
-            immunizationRepository.saveAll(sampleData);
-            System.out.println("Added " + sampleData.size() + " sample immunization records");
-        }
-
-        if (insuranceCardRepository.findByUserId(userId).isEmpty()) {
-            List<InsuranceCard> cards = createSampleInsuranceCards(userId);
-            insuranceCardRepository.saveAll(cards);
-            System.out.println("Added " + cards.size() + " sample insurance card records");
-        }
-
-        if (labResultRepository.findByUserId(userId).isEmpty()) {
-            List<LabResult> results = createSampleLabResults(userId);
-            labResultRepository.saveAll(results);
-            System.out.println("Added " + results.size() + " sample lab result records");
-        }
+    public void seedForUser(String userId) {
+        immunizationRepository.saveAll(createSampleImmunizations(userId));
+        insuranceCardRepository.saveAll(createSampleInsuranceCards(userId));
+        labResultRepository.saveAll(createSampleLabResults(userId));
     }
 
     private List<Immunization> createSampleImmunizations(String userId) {
