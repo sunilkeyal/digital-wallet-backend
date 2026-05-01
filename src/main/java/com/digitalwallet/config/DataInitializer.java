@@ -128,13 +128,12 @@ public class DataInitializer implements CommandLineRunner {
         for (int i = 0; i < plans.length; i++) {
             InsuranceCard card = new InsuranceCard();
             card.setUserId(userId);
-            card.setProviderName(plans[i][0]);
-            card.setPlanType(plans[i][1]);
+            card.setProvider(plans[i][0]);
             card.setPolicyNumber(plans[i][2]);
             card.setGroupNumber("GRP-" + (10000 + i));
             card.setMemberName("Admin User");
             card.setEffectiveDate(LocalDate.of(2024, 1, 1).plusYears(i % 2));
-            card.setExpirationDate(LocalDate.of(2025, 12, 31).plusYears(i % 2));
+            card.setExpiryDate(LocalDate.of(2025, 12, 31).plusYears(i % 2));
             cards.add(card);
         }
 
@@ -155,35 +154,19 @@ public class DataInitializer implements CommandLineRunner {
             {"Basic Metabolic Panel", "Downtown Medical Center", "Dr. Lee"}
         };
 
-        String[] statuses = {"Final", "Final", "Final", "Preliminary", "Final", "Final", "Final", "Preliminary"};
         LocalDate baseDate = LocalDate.of(2024, 1, 10);
 
         for (int i = 0; i < tests.length; i++) {
             LabResult result = new LabResult();
             result.setUserId(userId);
             result.setTestName(tests[i][0]);
-            result.setLaboratoryName(tests[i][1]);
-            result.setOrderingPhysician(tests[i][2]);
+            result.setLaboratory(tests[i][1]);
+            result.setOrderingProvider(tests[i][2]);
             result.setTestDate(baseDate.plusMonths(i));
-            result.setStatus(statuses[i]);
-            result.setDigitalSignature("DS-" + (200000 + i));
+            result.setResult(String.valueOf(5.0 + i * 0.3));
+            result.setUnit("mg/dL");
+            result.setReferenceRange("3.5 - 10.0");
             result.setNotes("Sample lab result #" + (i + 1));
-
-            LabResult.VitalStatistic vs = new LabResult.VitalStatistic();
-            vs.setName("Blood Pressure");
-            vs.setValue("120/80");
-            vs.setUnit("mmHg");
-            vs.setStatus("Normal");
-            result.setVitalStatistics(List.of(vs));
-
-            LabResult.TestResultValue trv = new LabResult.TestResultValue();
-            trv.setTestName(tests[i][0]);
-            trv.setResult(String.valueOf(5.0 + i * 0.3));
-            trv.setUnit("mg/dL");
-            trv.setReferenceRange("3.5 - 10.0");
-            trv.setFlag(i % 4 == 0 ? "H" : "N");
-            result.setTestResultValues(List.of(trv));
-
             results.add(result);
         }
 

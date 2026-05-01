@@ -1,12 +1,15 @@
 package com.digitalwallet.controller;
 
 import com.digitalwallet.dto.LabResultDto;
+import com.digitalwallet.security.JwtAuthenticationFilter;
+import com.digitalwallet.security.JwtUtil;
 import com.digitalwallet.service.LabResultService;
 import com.digitalwallet.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.bean.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LabResultController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class LabResultControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -29,6 +33,12 @@ class LabResultControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
     @WithMockUser

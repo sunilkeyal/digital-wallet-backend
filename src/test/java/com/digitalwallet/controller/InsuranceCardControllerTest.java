@@ -1,17 +1,19 @@
 package com.digitalwallet.controller;
 
 import com.digitalwallet.dto.InsuranceCardDto;
+import com.digitalwallet.security.JwtAuthenticationFilter;
+import com.digitalwallet.security.JwtUtil;
 import com.digitalwallet.service.InsuranceCardService;
 import com.digitalwallet.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.bean.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -20,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(InsuranceCardController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class InsuranceCardControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -29,6 +32,12 @@ class InsuranceCardControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
     @WithMockUser
@@ -46,7 +55,7 @@ class InsuranceCardControllerTest {
     void getInsuranceCard_returnsCard() throws Exception {
         InsuranceCardDto dto = new InsuranceCardDto();
         dto.setId("card1");
-        dto.setProviderName("Blue Cross");
+        dto.setProvider("Blue Cross");
         dto.setPolicyNumber("POL-12345");
 
         when(insuranceCardService.getById("card1")).thenReturn(dto);
@@ -54,7 +63,7 @@ class InsuranceCardControllerTest {
         mockMvc.perform(get("/api/insurance-cards/card1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("card1"))
-                .andExpect(jsonPath("$.providerName").value("Blue Cross"));
+                .andExpect(jsonPath("$.provider").value("Blue Cross"));
     }
 
     @Test
@@ -62,14 +71,14 @@ class InsuranceCardControllerTest {
     void createInsuranceCard_createsAndReturnsCard() throws Exception {
         InsuranceCardDto dto = new InsuranceCardDto();
         dto.setId("card1");
-        dto.setProviderName("Aetna");
+        dto.setProvider("Aetna");
 
         when(userService.getCurrentUserId()).thenReturn("user123");
         when(insuranceCardService.createInsuranceCard(any())).thenReturn(dto);
 
         mockMvc.perform(post("/api/insurance-cards")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"providerName\":\"Aetna\"}"))
+                        .content("{\"provider\":\"Aetna\"}"))
                 .andExpect(status().isCreated());
     }
 

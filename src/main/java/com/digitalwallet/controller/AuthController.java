@@ -4,8 +4,6 @@ import com.digitalwallet.dto.UserDto;
 import com.digitalwallet.entity.User;
 import com.digitalwallet.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -65,19 +63,6 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser() {
         String userId = userService.getCurrentUserId();
-        System.out.println("getCurrentUser called, userId: " + userId);
         return ResponseEntity.ok(userService.getUserById(userId));
-    }
-
-    @GetMapping("/debug")
-    public ResponseEntity<?> debug() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Debug - Principal: " + auth.getPrincipal());
-        System.out.println("Debug - Authorities: " + auth.getAuthorities());
-        return ResponseEntity.ok(Map.of(
-            "principal", auth.getPrincipal(),
-            "authorities", auth.getAuthorities().toString(),
-            "isAuthenticated", auth.isAuthenticated()
-        ));
     }
 }

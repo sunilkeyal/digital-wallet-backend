@@ -1,17 +1,19 @@
 package com.digitalwallet.controller;
 
 import com.digitalwallet.dto.ImmunizationDto;
+import com.digitalwallet.security.JwtAuthenticationFilter;
+import com.digitalwallet.security.JwtUtil;
 import com.digitalwallet.service.ImmunizationService;
 import com.digitalwallet.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.bean.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -21,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ImmunizationController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ImmunizationControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -31,13 +34,19 @@ class ImmunizationControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Test
     @WithMockUser
     void getAllImmunizations_returnsListOfImmunizations() throws Exception {
         when(userService.getCurrentUserId()).thenReturn("user123");
         when(immunizationService.getByUserId("user123")).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/immunizations"))
+        mockMvc.perform(get("/api/immunizations").param("size", "0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
@@ -48,7 +57,7 @@ class ImmunizationControllerTest {
         ImmunizationDto dto = new ImmunizationDto();
         dto.setId("imm1");
         dto.setVaccineName("Flu Shot");
-        dto.setAdministrationDate(LocalDate.of(2024, 1, 15));
+        dto.setAdministrationDate("2024-01-15");
 
         when(immunizationService.getById("imm1")).thenReturn(dto);
 
@@ -64,7 +73,7 @@ class ImmunizationControllerTest {
         ImmunizationDto dto = new ImmunizationDto();
         dto.setId("imm1");
         dto.setVaccineName("COVID-19");
-        dto.setAdministrationDate(LocalDate.of(2024, 3, 1));
+        dto.setAdministrationDate("2024-03-01");
 
         when(userService.getCurrentUserId()).thenReturn("user123");
         when(immunizationService.createImmunization(any())).thenReturn(dto);

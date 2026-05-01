@@ -85,7 +85,7 @@ class ImmunizationServiceTest {
 
         ImmunizationDto dto = new ImmunizationDto();
         dto.setVaccineName("Updated Vaccine");
-        dto.setAdministrationDate(LocalDate.of(2024, 6, 1));
+        dto.setAdministrationDate("2024-06-01");
 
         ImmunizationDto result = immunizationService.updateImmunization("imm1", dto);
 

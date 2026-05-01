@@ -38,16 +38,13 @@ public class InsuranceCardService {
     public InsuranceCardDto updateInsuranceCard(String id, InsuranceCardDto dto) {
         InsuranceCard card = insuranceCardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Insurance card not found"));
-        card.setProviderName(dto.getProviderName());
+        card.setProvider(dto.getProvider());
         card.setPolicyNumber(dto.getPolicyNumber());
         card.setGroupNumber(dto.getGroupNumber());
         card.setMemberName(dto.getMemberName());
+        card.setRelationship(dto.getRelationship());
         card.setEffectiveDate(dto.getEffectiveDate());
-        card.setExpirationDate(dto.getExpirationDate());
-        card.setPlanType(dto.getPlanType());
-        card.setFrontCardImageBase64(dto.getFrontCardImageBase64());
-        card.setBackCardImageBase64(dto.getBackCardImageBase64());
-        card.setQrCodeData(dto.getQrCodeData());
+        card.setExpiryDate(dto.getExpiryDate());
         card.setUpdatedAt(LocalDateTime.now());
         return mapToDto(insuranceCardRepository.save(card));
     }
@@ -60,16 +57,13 @@ public class InsuranceCardService {
         InsuranceCardDto dto = new InsuranceCardDto();
         dto.setId(card.getId());
         dto.setUserId(card.getUserId());
-        dto.setProviderName(card.getProviderName());
+        dto.setProvider(card.getProvider());
         dto.setPolicyNumber(card.getPolicyNumber());
         dto.setGroupNumber(card.getGroupNumber());
         dto.setMemberName(card.getMemberName());
+        dto.setRelationship(card.getRelationship());
         dto.setEffectiveDate(card.getEffectiveDate());
-        dto.setExpirationDate(card.getExpirationDate());
-        dto.setPlanType(card.getPlanType());
-        dto.setFrontCardImageBase64(card.getFrontCardImageBase64());
-        dto.setBackCardImageBase64(card.getBackCardImageBase64());
-        dto.setQrCodeData(card.getQrCodeData());
+        dto.setExpiryDate(card.getExpiryDate());
         dto.setCreatedAt(card.getCreatedAt() != null ? card.getCreatedAt().toString() : null);
         dto.setUpdatedAt(card.getUpdatedAt() != null ? card.getUpdatedAt().toString() : null);
         return dto;
@@ -79,16 +73,13 @@ public class InsuranceCardService {
         InsuranceCard card = new InsuranceCard();
         card.setId(dto.getId());
         card.setUserId(dto.getUserId());
-        card.setProviderName(dto.getProviderName());
+        card.setProvider(dto.getProvider());
         card.setPolicyNumber(dto.getPolicyNumber());
         card.setGroupNumber(dto.getGroupNumber());
         card.setMemberName(dto.getMemberName());
+        card.setRelationship(dto.getRelationship());
         card.setEffectiveDate(dto.getEffectiveDate());
-        card.setExpirationDate(dto.getExpirationDate());
-        card.setPlanType(dto.getPlanType());
-        card.setFrontCardImageBase64(dto.getFrontCardImageBase64());
-        card.setBackCardImageBase64(dto.getBackCardImageBase64());
-        card.setQrCodeData(dto.getQrCodeData());
+        card.setExpiryDate(dto.getExpiryDate());
         return card;
     }
 }

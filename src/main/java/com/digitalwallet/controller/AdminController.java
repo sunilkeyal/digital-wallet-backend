@@ -25,16 +25,9 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<UserDto> createUser(@RequestBody String body) {
-        // Parse the JSON manually to handle roles as string or array
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        try {
-            UserDto userDto = mapper.readValue(body, UserDto.class);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(userService.createUserFromDto(userDto));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse user data: " + e.getMessage());
-        }
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.createUserFromDto(userDto));
     }
 
     @DeleteMapping("/users/{id}")

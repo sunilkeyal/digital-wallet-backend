@@ -60,17 +60,7 @@ public class User {
     public String getOauth2Sub() { return oauth2Sub; }
     public void setOauth2Sub(String oauth2Sub) { this.oauth2Sub = oauth2Sub; }
 
-    // Accept both Set and String for roles
-    public void setRoles(Object roles) {
-        if (roles instanceof Set) {
-            this.roles = (Set<String>) roles;
-        } else if (roles instanceof String) {
-            this.roles = Set.of((String) roles);
-        } else {
-            this.roles = new HashSet<>();
-        }
-    }
-    
+    public void setRoles(Set<String> roles) { this.roles = roles; }
     public Set<String> getRoles() { return roles; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
