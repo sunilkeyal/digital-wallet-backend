@@ -1,8 +1,12 @@
 package com.digitalwallet.config;
 
 import com.digitalwallet.entity.Immunization;
+import com.digitalwallet.entity.InsuranceCard;
+import com.digitalwallet.entity.LabResult;
 import com.digitalwallet.repository.ImmunizationRepository;
-import com.digitalwallet.repository.UserRepository;
+import com.digitalwallet.repository.InsuranceCardRepository;
+import com.digitalwallet.repository.LabResultRepository;
+import com.digitalwallet.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -12,24 +16,43 @@ import java.util.List;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ImmunizationRepository immunizationRepository;
+    private final InsuranceCardRepository insuranceCardRepository;
+    private final LabResultRepository labResultRepository;
 
-    public DataInitializer(UserRepository userRepository, ImmunizationRepository immunizationRepository) {
-        this.userRepository = userRepository;
+    public DataInitializer(UserService userService,
+                           ImmunizationRepository immunizationRepository,
+                           InsuranceCardRepository insuranceCardRepository,
+                           LabResultRepository labResultRepository) {
+        this.userService = userService;
         this.immunizationRepository = immunizationRepository;
+        this.insuranceCardRepository = insuranceCardRepository;
+        this.labResultRepository = labResultRepository;
     }
 
     @Override
     public void run(String... args) {
-        var admin = userRepository.findByEmail("admin@digitalwallet.com");
-        if (admin.isPresent()) {
-            String userId = admin.get().getId();
-            if (immunizationRepository.findByUserId(userId).isEmpty()) {
-                List<Immunization> sampleData = createSampleImmunizations(userId);
-                immunizationRepository.saveAll(sampleData);
-                System.out.println("Added " + sampleData.size() + " sample immunization records");
-            }
+        var admin = userService.createAdminUser();
+        String userId = admin.getId();
+        System.out.println("Admin user ready: " + admin.getEmail());
+
+        if (immunizationRepository.findByUserId(userId).isEmpty()) {
+            List<Immunization> sampleData = createSampleImmunizations(userId);
+            immunizationRepository.saveAll(sampleData);
+            System.out.println("Added " + sampleData.size() + " sample immunization records");
+        }
+
+        if (insuranceCardRepository.findByUserId(userId).isEmpty()) {
+            List<InsuranceCard> cards = createSampleInsuranceCards(userId);
+            insuranceCardRepository.saveAll(cards);
+            System.out.println("Added " + cards.size() + " sample insurance card records");
+        }
+
+        if (labResultRepository.findByUserId(userId).isEmpty()) {
+            List<LabResult> results = createSampleLabResults(userId);
+            labResultRepository.saveAll(results);
+            System.out.println("Added " + results.size() + " sample lab result records");
         }
     }
 
@@ -89,5 +112,81 @@ public class DataInitializer implements CommandLineRunner {
         }
         
         return records;
+    }
+
+    private List<InsuranceCard> createSampleInsuranceCards(String userId) {
+        List<InsuranceCard> cards = new ArrayList<>();
+
+        String[][] plans = {
+            {"UnitedHealthcare", "PPO", "UHC-PPO-001"},
+            {"Blue Cross Blue Shield", "HMO", "BCBS-HMO-002"},
+            {"Aetna", "EPO", "AET-EPO-003"},
+            {"Cigna", "HDHP", "CIG-HDHP-004"},
+            {"Humana", "POS", "HUM-POS-005"}
+        };
+
+        for (int i = 0; i < plans.length; i++) {
+            InsuranceCard card = new InsuranceCard();
+            card.setUserId(userId);
+            card.setProviderName(plans[i][0]);
+            card.setPlanType(plans[i][1]);
+            card.setPolicyNumber(plans[i][2]);
+            card.setGroupNumber("GRP-" + (10000 + i));
+            card.setMemberName("Admin User");
+            card.setEffectiveDate(LocalDate.of(2024, 1, 1).plusYears(i % 2));
+            card.setExpirationDate(LocalDate.of(2025, 12, 31).plusYears(i % 2));
+            cards.add(card);
+        }
+
+        return cards;
+    }
+
+    private List<LabResult> createSampleLabResults(String userId) {
+        List<LabResult> results = new ArrayList<>();
+
+        String[][] tests = {
+            {"Complete Blood Count (CBC)", "City General Hospital", "Dr. Smith"},
+            {"Comprehensive Metabolic Panel", "Downtown Medical Center", "Dr. Johnson"},
+            {"Lipid Panel", "Community Health Clinic", "Dr. Patel"},
+            {"Thyroid Function (TSH)", "University Health Services", "Dr. Lee"},
+            {"Hemoglobin A1c", "Family Medicine Practice", "Dr. Smith"},
+            {"Urinalysis", "City General Hospital", "Dr. Johnson"},
+            {"Vitamin D, 25-Hydroxy", "Community Health Clinic", "Dr. Patel"},
+            {"Basic Metabolic Panel", "Downtown Medical Center", "Dr. Lee"}
+        };
+
+        String[] statuses = {"Final", "Final", "Final", "Preliminary", "Final", "Final", "Final", "Preliminary"};
+        LocalDate baseDate = LocalDate.of(2024, 1, 10);
+
+        for (int i = 0; i < tests.length; i++) {
+            LabResult result = new LabResult();
+            result.setUserId(userId);
+            result.setTestName(tests[i][0]);
+            result.setLaboratoryName(tests[i][1]);
+            result.setOrderingPhysician(tests[i][2]);
+            result.setTestDate(baseDate.plusMonths(i));
+            result.setStatus(statuses[i]);
+            result.setDigitalSignature("DS-" + (200000 + i));
+            result.setNotes("Sample lab result #" + (i + 1));
+
+            LabResult.VitalStatistic vs = new LabResult.VitalStatistic();
+            vs.setName("Blood Pressure");
+            vs.setValue("120/80");
+            vs.setUnit("mmHg");
+            vs.setStatus("Normal");
+            result.setVitalStatistics(List.of(vs));
+
+            LabResult.TestResultValue trv = new LabResult.TestResultValue();
+            trv.setTestName(tests[i][0]);
+            trv.setResult(String.valueOf(5.0 + i * 0.3));
+            trv.setUnit("mg/dL");
+            trv.setReferenceRange("3.5 - 10.0");
+            trv.setFlag(i % 4 == 0 ? "H" : "N");
+            result.setTestResultValues(List.of(trv));
+
+            results.add(result);
+        }
+
+        return results;
     }
 }
