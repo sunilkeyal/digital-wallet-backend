@@ -6,11 +6,11 @@ spring:
       uri: mongodb://localhost:27017/digital-wallet
 
 jwt:
-  secret: digital-wallet-secret-key-must-be-at-least-256-bits-long-for-hs256-encryption
-  expiration: 86400000
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 app:
   admin:
-    username: admin
-    password: admin123
-    email: admin@digitalwallet.com
+    username: ${APP_ADMIN_USERNAME:admin}
+    password: ${APP_ADMIN_PASSWORD}
+    email: ${APP_ADMIN_EMAIL:admin@digitalwallet.com}

@@ -1,0 +1,9 @@
+jwt:
+  secret: test-jwt-secret-key-should-not-be-used-in-production
+  expiration: 86400000
+
+app:
+  admin:
+    username: admin
+    password: admin123
+    email: admin@digitalwallet.com

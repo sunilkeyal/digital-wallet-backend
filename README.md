@@ -26,16 +26,18 @@ By default, the backend connects to MongoDB at:
 spring.data.mongodb.uri: mongodb://localhost:27017/digital-wallet
 ```
 
-JWT properties are defined in `src/main/resources/application.yml`:
+JWT properties are defined in `src/main/resources/application.yml` and should be provided using environment variables:
 
-- `jwt.secret` - secret key used to sign JWT tokens
-- `jwt.expiration` - token expiration in milliseconds
+- `JWT_SECRET` - secret key used to sign JWT tokens
+- `JWT_EXPIRATION` - token expiration in milliseconds (default `86400000`)
 
-Admin credentials are also configured in `application.yml` for the seeded admin user:
+Admin credentials should also be provided through environment variables:
 
-- username: `admin`
-- password: `admin123`
-- email: `admin@digitalwallet.com`
+- `APP_ADMIN_USERNAME` - default `admin`
+- `APP_ADMIN_PASSWORD` - admin password (required)
+- `APP_ADMIN_EMAIL` - default `admin@digitalwallet.com`
+
+> Do not commit secrets or production credentials to source control.
 
 ## Run locally
 
