@@ -14,12 +14,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -146,5 +148,58 @@ class UserServiceTest {
         when(jwtUtil.generateToken("user1", "user@example.com", Set.of("ROLE_USER"))).thenReturn("jwt-token");
 
         assertEquals("jwt-token", userService.generateToken(user));
+    }
+
+    @Test
+    void createAdminUser_returnsExistingAdminWhenPresent() {
+        User existing = new User();
+        existing.setEmail("admin@example.com");
+        existing.setPassword("encoded");
+
+        when(userRepository.findByEmail("admin@example.com")).thenReturn(Optional.of(existing));
+
+        User result = userService.createAdminUser();
+
+        assertEquals(existing, result);
+    }
+
+    @Test
+    void createAdminUser_createsNewAdminWhenMissing() {
+        when(userRepository.findByEmail("admin@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("adminpass")).thenReturn("encoded-admin");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        User result = userService.createAdminUser();
+
+        assertEquals("admin@example.com", result.getEmail());
+        assertTrue(result.getRoles().contains("ROLE_ADMIN"));
+        assertEquals("encoded-admin", result.getPassword());
+    }
+
+    @Test
+    void getAllUsers_returnsMappedDtos() {
+        User user = new User();
+        user.setId("user1");
+        user.setEmail("user@example.com");
+        when(userRepository.findAll()).thenReturn(List.of(user));
+
+        assertEquals(1, userService.getAllUsers().size());
+    }
+
+    @Test
+    void findByEmail_returnsOptional() {
+        User user = new User();
+        user.setEmail("found@example.com");
+        when(userRepository.findByEmail("found@example.com")).thenReturn(Optional.of(user));
+
+        assertTrue(userService.findByEmail("found@example.com").isPresent());
+    }
+
+    @Test
+    void findByOauth2ProviderAndSub_returnsOptional() {
+        User user = new User();
+        when(userRepository.findByOauth2ProviderAndOauth2Sub("google", "sub123")).thenReturn(Optional.of(user));
+
+        assertTrue(userService.findByOauth2ProviderAndSub("google", "sub123").isPresent());
     }
 }
